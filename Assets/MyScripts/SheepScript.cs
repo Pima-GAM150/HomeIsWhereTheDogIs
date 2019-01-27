@@ -5,16 +5,19 @@ using UnityEngine;
 public class SheepScript : MonoBehaviour
 {
     DogScript avoidThisDog;
+    FoxScript avoidThisFox;
     GoalPenScript thePen;
 
     Transform sheepPosition;
     float distanceFromDog;
+    float distanceFromFox;
 
     public enum StateOfSheep { captured = 0, free = 1, dead = 2 }
     public StateOfSheep sheepState;
 
     public float moveSpeed;
     public float retreatDistance;
+    public float herdingDistance;
 
     public delegate void CollectSheep(SheepScript sheep);
     public static event CollectSheep SheepCaptured;
@@ -24,6 +27,8 @@ public class SheepScript : MonoBehaviour
     {
         avoidThisDog = FindObjectOfType<DogScript>();
         thePen = FindObjectOfType<GoalPenScript>();
+
+        avoidThisFox = FindObjectOfType<FoxScript>();
         sheepPosition = gameObject.transform;
         sheepState = StateOfSheep.free;
     }
@@ -33,8 +38,10 @@ public class SheepScript : MonoBehaviour
     {
         if (sheepState == StateOfSheep.free)
         {
-            GetDistanceBetweenSheepAndDog();
-            StayAwayFromDog();
+            GetDistanceBetweenSheepAndDogAndFox();
+            BeingHerdByDog();
+            if (avoidThisFox != null)
+                StayAwayFromFox();
         }
         else if (sheepState == StateOfSheep.captured)
         {
@@ -52,17 +59,27 @@ public class SheepScript : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, thePen.gatherPoint.position, (moveSpeed / 2f) * Time.deltaTime);
     }
 
-    void StayAwayFromDog()
+    void BeingHerdByDog()
     {
-        if (distanceFromDog < retreatDistance)
-        {//to make the enemy retreat the speed is negative.
-            transform.position = Vector3.MoveTowards(transform.position, avoidThisDog.gameObject.transform.position, -moveSpeed * Time.deltaTime);
+        if (distanceFromDog < herdingDistance)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, thePen.transform.position, moveSpeed * Time.deltaTime);
         }
     }
 
-    void GetDistanceBetweenSheepAndDog()
+    void StayAwayFromFox()
+    {
+        if (distanceFromFox < retreatDistance)
+        {//to make the enemy retreat the speed is negative.
+            transform.position = Vector3.MoveTowards(transform.position, avoidThisFox.gameObject.transform.position, -moveSpeed * Time.deltaTime);
+        }
+    }
+
+    void GetDistanceBetweenSheepAndDogAndFox()
     {
         distanceFromDog = Vector3.Distance(avoidThisDog.gameObject.transform.position, sheepPosition.transform.position);
+        if (avoidThisFox != null)
+            distanceFromFox = Vector3.Distance(avoidThisFox.gameObject.transform.position, sheepPosition.transform.position);
     }
 
     void OnTriggerEnter(Collider other)

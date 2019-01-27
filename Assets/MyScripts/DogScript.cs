@@ -1,5 +1,4 @@
-﻿using UnityEngine.Events;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class DogScript : MonoBehaviour

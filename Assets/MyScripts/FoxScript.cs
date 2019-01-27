@@ -14,11 +14,15 @@ public class FoxScript : MonoBehaviour
     float distanceFromDog;
     public float retreatDistance;
 
+    private void Awake()
+    {
+        fox = GetComponent<NavMeshAgent>();
+    }
 
     void Start()
     {
         dog = FindObjectOfType<DogScript>();
-        fox = GetComponent<NavMeshAgent>();
+        
         sheepToEat = FindObjectsOfType<SheepScript>();
     }
 
@@ -43,15 +47,20 @@ public class FoxScript : MonoBehaviour
 
    void ChaseAfterSheepToEat()
     {
-        if (currentSheepTarget == null || currentSheepTarget.GetComponent<SheepScript>().sheepState == SheepScript.StateOfSheep.captured)
+        if (sheepToEat != null)
         {
-            int rng;
-            rng = Random.Range(0, sheepToEat.Length);
-            currentSheepTarget = sheepToEat[rng].gameObject.transform;
+            if (currentSheepTarget == null || currentSheepTarget.GetComponent<SheepScript>().sheepState == SheepScript.StateOfSheep.captured)
+            {
+                int rng;
+                rng = Random.Range(0, sheepToEat.Length);
+                currentSheepTarget = sheepToEat[rng].gameObject.transform;
+            }
+            else
+            {
+                fox.SetDestination(currentSheepTarget.position);
+            }
         }
-        else
-        {
+        else//end sheeptoeat
             fox.SetDestination(currentSheepTarget.position);
-        }
     }
 }
