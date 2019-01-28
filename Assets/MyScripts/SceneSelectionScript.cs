@@ -10,33 +10,39 @@ public class SceneSelectionScript : MonoBehaviour
     int level1 = 1;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        currentLevel = SceneManager.GetActiveScene();
-    }
-
+   
     // Update is called once per frame
     void Update()
     {
         
     }
 
-    void FadeToLevel (int levelIndex)
+    public void FadeToLevel (int levelIndex)
     {
         SceneManager.LoadScene(levelToLoad);
     }
 
-    void ReplayCurrentLevel()
+    public void StartGame()
     {
-
+        SceneManager.LoadScene(1);
     }
 
-    void NextLevel()
+    public void ReplayCurrentLevel()
     {
-
+        currentLevel = SceneManager.GetActiveScene();
+        int currentLVl = currentLevel.buildIndex;
+        SceneManager.LoadScene(currentLVl);
     }
 
-    void QuitGame()
+    public void NextLevel()
+    {
+        currentLevel = SceneManager.GetActiveScene();
+        int nextlvl = currentLevel.buildIndex;
+        nextlvl++;
+        SceneManager.LoadScene(nextlvl);
+    }
+
+    public void QuitGame()
     {
         Debug.Log("Quit Game");
         Application.Quit();

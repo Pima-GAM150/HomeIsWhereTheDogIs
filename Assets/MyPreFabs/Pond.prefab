@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6167003291184906762}
   - component: {fileID: 6167003291184906763}
   - component: {fileID: 6167003291184906760}
-  - component: {fileID: 6167003291184906761}
+  - component: {fileID: 3922844995106171198}
   m_Layer: 4
   m_Name: Pond
   m_TagString: Hazard
@@ -78,8 +78,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &6167003291184906761
-CapsuleCollider:
+--- !u!64 &3922844995106171198
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -88,7 +88,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.5555973
-  m_Height: 1.0252857
-  m_Direction: 0
-  m_Center: {x: -0.0034818607, y: 0, z: -0.012447993}
+  serializedVersion: 3
+  m_Convex: 1
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}

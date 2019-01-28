@@ -49,7 +49,7 @@ public class FoxScript : MonoBehaviour
     {
         if (sheepToEat != null)
         {
-            if (currentSheepTarget == null || currentSheepTarget.GetComponent<SheepScript>().sheepState == SheepScript.StateOfSheep.captured)
+            if (currentSheepTarget == null ||currentSheepTarget.GetComponent<SheepScript>().sheepState == SheepScript.StateOfSheep.captured)
             {
                 int rng;
                 rng = Random.Range(0, sheepToEat.Length);
@@ -61,6 +61,6 @@ public class FoxScript : MonoBehaviour
             }
         }
         else//end sheeptoeat
-            fox.SetDestination(currentSheepTarget.position);
+            fox.SetDestination(foxHole.position);
     }
 }
