@@ -5,17 +5,36 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+   // public static UIManager instance;
+
     public Canvas playScreen;
     public Canvas endScreen;
     public Text sheepCollectedLabel;
     public Text numberOfClicksLabel;
 
-    
+    private void Awake()
+    {
+        //if (instance == null)
+        //    instance = this;
+        //else
+        //{
+        //    Destroy(gameObject);
+        //    return;
+        //}
+        //DontDestroyOnLoad(instance);
+        //DogScript.WonTheRound += OnRoundEnd;
+    }
 
     void Start()
     {
-        DogScript.WonTheRound += OnRoundEnd;
+        
         endScreen.gameObject.SetActive(false);
+    }
+
+    private void OnRenderObject()
+    {
+
+        //endScreen.gameObject.SetActive(false);
     }
 
     // Update is called once per frame

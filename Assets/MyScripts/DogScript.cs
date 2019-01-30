@@ -18,13 +18,18 @@ public class DogScript : MonoBehaviour
     public delegate void CapturedAllSheep(DogScript dog);
     public static event CapturedAllSheep WonTheRound;
 
+    private void Awake()
+    {
+        
+        UI = FindObjectOfType<UIManager>();
+        sheepToHerd = FindObjectsOfType<SheepScript>();
+    }
+
     void Start()
     {
         numberOfCommandsGiven = 0;
         amountOfSheepCaught = 0;
-        sheepToHerd = FindObjectsOfType<SheepScript>();
         numOfSheepToCatch = sheepToHerd.Length;
-
         SheepScript.SheepCaptured += OnSheepCapture;
     }
 
@@ -40,13 +45,17 @@ public class DogScript : MonoBehaviour
     {
         if (amountOfSheepCaught == sheepToHerd.Length)
         {
-            WonTheRound(this);
+            UI.endScreen.gameObject.SetActive(true);
         }
     }
 
     void UIUpdates()
     {
-        UI.numberOfClicksLabel.text = "Number of Commands " + numberOfCommandsGiven.ToString(); 
+        if (UI != null)
+        {
+            UI.numberOfClicksLabel.text = "Number of Commands: " + numberOfCommandsGiven.ToString();
+            UI.sheepCollectedLabel.text = "Sheep Gathered: " + amountOfSheepCaught.ToString();
+        }
     }
 
     void OnSheepCapture(SheepScript sheepThatWasCaught)
