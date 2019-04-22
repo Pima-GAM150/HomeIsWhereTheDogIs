@@ -1,13 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine.AI;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class SheepScript : MonoBehaviour
 {
+    List<Foliage> eats = new List<Foliage>();
     DogScript avoidThisDog;
     FoxScript avoidThisFox;
     GoalPenScript thePen;
 
+    NavMeshAgent sheep;
     Transform sheepPosition;
     float distanceFromDog;
     float distanceFromFox;
@@ -22,11 +24,19 @@ public class SheepScript : MonoBehaviour
     public delegate void CollectSheep(SheepScript sheep);
     public static event CollectSheep SheepCaptured;
 
-    // Start is called before the first frame update
+
+    private void Awake()
+    {
+        sheep = GetComponent<NavMeshAgent>();
+    }
+
+
+
     void Start()
     {
         avoidThisDog = FindObjectOfType<DogScript>();
         thePen = FindObjectOfType<GoalPenScript>();
+        eats.AddRange(FindObjectsOfType<Foliage>());
 
         avoidThisFox = FindObjectOfType<FoxScript>();
         sheepPosition = gameObject.transform;
@@ -42,6 +52,9 @@ public class SheepScript : MonoBehaviour
             BeingHerdByDog();
             if (avoidThisFox != null)
                 StayAwayFromFox();
+            if (distanceFromFox > retreatDistance)
+                SafeToEat();
+
         }
         else if (sheepState == StateOfSheep.captured)
         {
@@ -53,6 +66,14 @@ public class SheepScript : MonoBehaviour
         }
     }
 
+    void SafeToEat()
+    {
+        Foliage[] options = eats.ToArray();
+        int rng = Random.Range(0, (options.Length-1));
+
+         sheep.SetDestination(options[rng].transform.position);
+        
+    }
 
     void MoveInPen()
     {
@@ -63,7 +84,9 @@ public class SheepScript : MonoBehaviour
     {
         if (distanceFromDog < herdingDistance)
         {
-            transform.position = Vector3.MoveTowards(transform.position, thePen.transform.position, moveSpeed * Time.deltaTime);
+            // transform.position = Vector3.MoveTowards(transform.position, thePen.transform.position, moveSpeed * Time.deltaTime);
+            sheep.SetDestination(thePen.transform.position);
+
         }
     }
 
@@ -71,8 +94,40 @@ public class SheepScript : MonoBehaviour
     {
         if (distanceFromFox < retreatDistance)
         {//to make the enemy retreat the speed is negative.
-            transform.position = Vector3.MoveTowards(transform.position, avoidThisFox.gameObject.transform.position, -moveSpeed * Time.deltaTime);
+            //transform.position = Vector3.MoveTowards(transform.position, avoidThisFox.gameObject.transform.position, -moveSpeed * Time.deltaTime);
+            sheep.SetDestination(RandomRetreat());
         }
+    }
+
+    public Vector3 RandomRetreat()
+    {
+        Vector3 retreatTo = new Vector3();
+        float timer = 2f;
+        int run = (int)retreatDistance;
+        int rngwhere = Random.Range(1, 2);
+
+        if (avoidThisFox.transform.position.x > transform.position.x && rngwhere == 1)
+        {            
+            retreatTo = new Vector3(gameObject.transform.position.x - run, gameObject.transform.position.y, gameObject.transform.position.z);
+            timer -= Time.deltaTime;
+        }
+        if (avoidThisFox.transform.position.x < transform.position.x && rngwhere == 2)
+        {
+            retreatTo = new Vector3(gameObject.transform.position.x + run, gameObject.transform.position.y, gameObject.transform.position.z);
+            timer -= Time.deltaTime;
+        }
+        if (avoidThisFox.transform.position.z > transform.position.z && rngwhere == 2)
+        {
+            retreatTo = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z - run);
+            timer -= Time.deltaTime;
+        }
+        if (avoidThisFox.transform.position.z < transform.position.z && rngwhere == 1)
+        {
+            retreatTo = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z + run);
+            timer -= Time.deltaTime;
+        }
+
+        return retreatTo;
     }
 
     void GetDistanceBetweenSheepAndDogAndFox()
@@ -82,11 +137,15 @@ public class SheepScript : MonoBehaviour
             distanceFromFox = Vector3.Distance(avoidThisFox.gameObject.transform.position, sheepPosition.transform.position);
     }
 
-    void OnTriggerEnter(Collider other)
+
+    private void OnTriggerEnter(Collider other)
     {
+        
         GameObject hit = other.gameObject;
+        Debug.Log("Touching " + hit.tag);
         if (hit.CompareTag("GoalPen"))
         {
+            Debug.Log("GOOOAALL");
             sheepState = StateOfSheep.captured;
             SheepCaptured(this);
            

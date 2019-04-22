@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class DogScript : MonoBehaviour
 {
@@ -8,8 +10,8 @@ public class DogScript : MonoBehaviour
     public NavMeshAgent agent;
     public int numberOfCommandsGiven;
 
-    public SheepScript[] sheepToHerd;
-    int numOfSheepToCatch;
+    List<SheepScript> sheepToHerd = new List<SheepScript>();
+    public int numOfSheepToCatch;
     public int amountOfSheepCaught;
 
     public delegate void ClickToMove(DogScript movePoint);
@@ -22,14 +24,14 @@ public class DogScript : MonoBehaviour
     {
         
         UI = FindObjectOfType<UIManager>();
-        sheepToHerd = FindObjectsOfType<SheepScript>();
+        sheepToHerd.AddRange(FindObjectsOfType<SheepScript>());
     }
 
     void Start()
     {
         numberOfCommandsGiven = 0;
         amountOfSheepCaught = 0;
-        numOfSheepToCatch = sheepToHerd.Length;
+        numOfSheepToCatch = sheepToHerd.Capacity;
         SheepScript.SheepCaptured += OnSheepCapture;
     }
 
@@ -43,7 +45,7 @@ public class DogScript : MonoBehaviour
 
     void CheckSheepState()
     {
-        if (amountOfSheepCaught == sheepToHerd.Length)
+        if (amountOfSheepCaught == sheepToHerd.Capacity)
         {
             UI.endScreen.gameObject.SetActive(true);
         }

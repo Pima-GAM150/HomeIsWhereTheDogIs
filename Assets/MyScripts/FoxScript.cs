@@ -7,7 +7,7 @@ public class FoxScript : MonoBehaviour
 {
     NavMeshAgent fox;
     DogScript dog;
-    SheepScript[] sheepToEat;
+    List<SheepScript> sheepToEat = new List<SheepScript>();
     Transform currentSheepTarget;
     public Transform foxHole;
 
@@ -23,7 +23,7 @@ public class FoxScript : MonoBehaviour
     {
         dog = FindObjectOfType<DogScript>();
         
-        sheepToEat = FindObjectsOfType<SheepScript>();
+        sheepToEat.AddRange(FindObjectsOfType<SheepScript>());
     }
 
     // Update is called once per frame
@@ -52,7 +52,7 @@ public class FoxScript : MonoBehaviour
             if (currentSheepTarget == null ||currentSheepTarget.GetComponent<SheepScript>().sheepState == SheepScript.StateOfSheep.captured)
             {
                 int rng;
-                rng = Random.Range(0, sheepToEat.Length);
+                rng = Random.Range(0, sheepToEat.Capacity);
                 currentSheepTarget = sheepToEat[rng].gameObject.transform;
             }
             else

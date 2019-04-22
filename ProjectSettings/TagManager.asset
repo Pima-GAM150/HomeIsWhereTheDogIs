@@ -9,6 +9,7 @@ TagManager:
   - GoalPen
   - Enemy
   - Hazard
+  - Foliage
   layers:
   - Default
   - TransparentFX
