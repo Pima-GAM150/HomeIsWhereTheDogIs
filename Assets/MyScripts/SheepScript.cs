@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class SheepScript : MonoBehaviour
 {
-    List<Foliage> eats = new List<Foliage>();
+    public List<Foliage> eats = new List<Foliage>();
     DogScript avoidThisDog;
     FoxScript avoidThisFox;
     GoalPenScript thePen;
@@ -23,6 +23,9 @@ public class SheepScript : MonoBehaviour
 
     public delegate void CollectSheep(SheepScript sheep);
     public static event CollectSheep SheepCaptured;
+
+    public delegate void HearSheepDie(SheepScript deadSheep);
+    public static event HearSheepDie SheepDied;
 
 
     private void Awake()
@@ -52,12 +55,15 @@ public class SheepScript : MonoBehaviour
             BeingHerdByDog();
             if (avoidThisFox != null)
                 StayAwayFromFox();
-            if (distanceFromFox > retreatDistance)
+            if (distanceFromFox > retreatDistance && distanceFromDog > herdingDistance)
                 SafeToEat();
 
         }
         else if (sheepState == StateOfSheep.captured)
         {
+            gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            //sheep.enabled = false;
+
             MoveInPen();
         }
         else if (sheepState == StateOfSheep.dead)
@@ -77,7 +83,7 @@ public class SheepScript : MonoBehaviour
 
     void MoveInPen()
     {
-        transform.position = Vector3.MoveTowards(transform.position, thePen.gatherPoint.position, (moveSpeed / 2f) * Time.deltaTime);
+        sheep.SetDestination(thePen.gatherPoint.position);
     }
 
     void BeingHerdByDog()
@@ -116,16 +122,27 @@ public class SheepScript : MonoBehaviour
             retreatTo = new Vector3(gameObject.transform.position.x + run, gameObject.transform.position.y, gameObject.transform.position.z);
             timer -= Time.deltaTime;
         }
-        if (avoidThisFox.transform.position.z > transform.position.z && rngwhere == 2)
+        if (avoidThisFox.transform.position.x > transform.position.x && rngwhere == 2)
+        {
+            retreatTo = new Vector3(gameObject.transform.position.x + run, gameObject.transform.position.y, gameObject.transform.position.z);
+            timer -= Time.deltaTime;
+        }
+        if (avoidThisFox.transform.position.x < transform.position.x && rngwhere == 1)
+        {
+            retreatTo = new Vector3(gameObject.transform.position.x - run, gameObject.transform.position.y, gameObject.transform.position.z);
+            timer -= Time.deltaTime;
+        }
+        if (avoidThisFox.transform.position.z > transform.position.z)
         {
             retreatTo = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z - run);
             timer -= Time.deltaTime;
         }
-        if (avoidThisFox.transform.position.z < transform.position.z && rngwhere == 1)
+        if (avoidThisFox.transform.position.z < transform.position.z)
         {
             retreatTo = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z + run);
             timer -= Time.deltaTime;
         }
+
 
         return retreatTo;
     }
@@ -146,15 +163,16 @@ public class SheepScript : MonoBehaviour
         if (hit.CompareTag("GoalPen"))
         {
             Debug.Log("GOOOAALL");
-            sheepState = StateOfSheep.captured;
             SheepCaptured(this);
-           
-           
-            
+            sheepState = StateOfSheep.captured;
+
+
+
         }
         else if (hit.CompareTag("Enemy") || hit.CompareTag("Hazard"))
         {
             sheepState = StateOfSheep.dead;
+            SheepDied(this);
         }
     }
 

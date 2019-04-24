@@ -10,7 +10,7 @@ public class DogScript : MonoBehaviour
     public NavMeshAgent agent;
     public int numberOfCommandsGiven;
 
-    List<SheepScript> sheepToHerd = new List<SheepScript>();
+    public List<SheepScript> sheepToHerd = new List<SheepScript>();
     public int numOfSheepToCatch;
     public int amountOfSheepCaught;
 
@@ -19,6 +19,8 @@ public class DogScript : MonoBehaviour
 
     public delegate void CapturedAllSheep(DogScript dog);
     public static event CapturedAllSheep WonTheRound;
+
+    
 
     private void Awake()
     {
@@ -31,8 +33,9 @@ public class DogScript : MonoBehaviour
     {
         numberOfCommandsGiven = 0;
         amountOfSheepCaught = 0;
-        numOfSheepToCatch = sheepToHerd.Capacity;
+        numOfSheepToCatch = sheepToHerd.Count;
         SheepScript.SheepCaptured += OnSheepCapture;
+        SheepScript.SheepDied += OnSheepDeath;
     }
 
 
@@ -45,7 +48,7 @@ public class DogScript : MonoBehaviour
 
     void CheckSheepState()
     {
-        if (amountOfSheepCaught == sheepToHerd.Capacity)
+        if (amountOfSheepCaught >= sheepToHerd.Count)
         {
             UI.endScreen.gameObject.SetActive(true);
         }
@@ -64,6 +67,11 @@ public class DogScript : MonoBehaviour
     {
         amountOfSheepCaught++;
     }
+
+    void OnSheepDeath(SheepScript sheepThatDied)
+    {
+        sheepToHerd.Remove(sheepThatDied);
+   }
 
     void MoveByFollowingTheMousePointer()
     {
